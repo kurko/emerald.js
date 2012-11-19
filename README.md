@@ -1,29 +1,38 @@
-## Draft features
+== Goals
 
+* To automatize the process of updating UI elements
+* To not use template engines, to use only HTML
+* To work on the assumption that the persistence mechanism is a RESTful Rails controller
+
+== Draft features
+
+**HTML**
 ```html
+<!-- Begins the cartView View -->
 <div class="options" data-view="cartView">
-  Shipping type:
-  <input type="radio" name="type" value="slow" checked="checked" data-view-element="zipcodeCalculation" /> Slow
-
+  Choose the shipping type:
+  <input type="radio" name="type" value="slow" data-view-element="zipcodeCalculation" checked="checked" /> Slow
   <input type="radio" name="type" value="fast" data-view-element="zipcodeCalculation" /> Fast
 
-  Zipcode:
-  <input type="text" value="1234567" name="zipcode" data-event="keyup" data-view-element="zipcodeCalculation" />
+  <!-- it is a zipcodeCalculation element -->
+  Type your zipcode:
+  <input value="" name="zipcode" data-view-element="zipcodeCalculation" data-event="keyup" />
 
   <span data-observe="shipping.cost">No delivery costs defined</div>
 </div>
 ```
 
-Here, all elements are bound to `zipcodeCalculation` action with
+Here, all elements are bound to `zipcodeCalculation` action as defined in
 `data-view-element` and belongs to the `cartView` view, defined in the `data-view`
 attribute.
 
-The Javascript is described below. Whenever the user types something in the
-`zipcode` fields, `zipcodeCalculation` action below takes place.
+Whenever the user types something in the
+`zipcode` field, the `zipcodeCalculation` action below takes place.
+The Javascript part is described below.
 
+**Javascript**
 ```javascript
-// The view, which represents the HTML elements
-
+// The View, which represents the HTML elements
 Emerald.shippingCostView = Emerald.View.extend({
   initialize: function(){ },
 
@@ -71,7 +80,7 @@ Emerald.Router = {
 }
 ```
 
-### Automatic updating
+### Automatic updating UI elements
 
 Consider the field below:
 
@@ -81,10 +90,14 @@ Consider the field below:
 
 Whenever we get a response from the server, such as
 
-```json
+```
 { 'shipping': {'type': 'fast', 'cost': 'US 10.00'}}
 ```
 
 The `modelObserver` will check for HTML elements containing `data-observe`, then
 will interpret to which model attribute this element is linked to, in this case
 `cost` in the `shipping` resource, and will update the element automatically.
+
+== License
+
+Ruby on Rails is released under the MIT License.
