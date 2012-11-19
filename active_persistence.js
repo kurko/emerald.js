@@ -6,8 +6,8 @@ function emeraldPersistence(model){
       return this;
     }
 
-    this.save = function(callback){
-      return new this._class.PersistenceSave().save(callback);
+    this.save = function(data, callbackController){
+      return new this._class.PersistenceSave().save(data, callbackController);
     }
   }
 
@@ -19,8 +19,9 @@ function emeraldPersistence(model){
         return this;
       }
 
-      this.save = function(controller) {
-        var attributes = this.model.attributes();
+      this.save = function(data, controller) {
+        //var attributes = this.model.attributes();
+        var attributes = data;
         var _controller = controller;
 
         var requestSpecs = {
@@ -31,6 +32,7 @@ function emeraldPersistence(model){
         };
 
         $.ajax(requestSpecs).done(function(JSON) {
+          debugger;
           if (_controller)
             _controller.persistViewCallback(JSON);
         }).fail(function(response) {
@@ -48,7 +50,6 @@ function emeraldPersistence(model){
         else
           return "POST";
       }
-
     }
 
     var instance = new singleton().initialize(model, this);

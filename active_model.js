@@ -16,8 +16,8 @@ function emeraldActiveModelInstance(properties){
 
     this.attributes = function() {
       attributesValues = {};
-      if (this.properties.attr_accessible) {
-        var attributes = this.properties.attr_accessible;
+      if (this.properties.attrAccessible) {
+        var attributes = this.properties.attrAccessible;
         for (attribute in attributes) {
           var attributeName = attributes[attribute];
           if (this[attributeName])
@@ -36,8 +36,10 @@ function emeraldActiveModelInstance(properties){
         return "none";
     }
 
-    this.save = function(and_callback) {
-      var persistence = new emeraldPersistence(this).save(and_callback);
+    this.save = function(data, andCallbackController) {
+      // TODO verify that `data` fields are the ones listed in this.attrAccessible
+      debugger;
+      var persistence = new emeraldPersistence(this).save(data, andCallbackController);
       return persistence;
     }
   }
@@ -49,6 +51,6 @@ function emeraldActiveModelInstance(properties){
   }
 
   var instance = new singleton().self(properties);
-  createAccessibleAttributes(singleton, properties.attr_accessible);
+  createAccessibleAttributes(singleton, properties.attrAccessible);
   return instance;
 }

@@ -20,9 +20,21 @@ function emeraldActionControllerInstance(properties){
       return this;
     }
 
+    this.params = function(domElements){
+      var params = new Object;
+
+      for (i = 0; i < domElements.length; i++) {
+        var element = domElements[i];
+        params[element.name] = element.value;
+      }
+
+      return params;
+    }
+
     this.persistView = true;
 
     this.persistViewCallback = function(JSON) {
+      debugger;
       if (this.persistView)
         Emerald.modelObserver.update(JSON);
       return true;

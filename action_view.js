@@ -47,8 +47,13 @@ function emeraldView(){
 
         _event = Emerald.View.viewElements.defineDefaultEvent(viewElement, _event);
 
+        var dataFieldSelector = "";
+        dataFieldSelector+= "input[type='text'][data-view-element='"+_viewAction+"'], ";
+        dataFieldSelector+= "input[type='radio'][data-view-element='"+_viewAction+"']:checked";
+
         $(this).on(_event, function(e){
-          cartViewActions[_viewAction](e);
+          var dataFields = $(dataFieldSelector);
+          cartViewActions[_viewAction](e, dataFields);
         });
       });
     }
