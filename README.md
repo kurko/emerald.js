@@ -8,8 +8,8 @@
 
 **HTML**
 ```html
-<!-- Begins the cartView View -->
-<div class="options" data-view="cartView">
+<!-- Begins the shippingCostView View -->
+<div class="options" data-view="shippingCostView">
   Choose the shipping type:
   <input type="radio" name="type" value="slow" data-view-element="zipcodeCalculation" checked="checked" /> Slow
   <input type="radio" name="type" value="fast" data-view-element="zipcodeCalculation" /> Fast
@@ -23,7 +23,7 @@
 ```
 
 Here, all elements are bound to `zipcodeCalculation` action as defined in
-`data-view-element` and belongs to the `cartView` view, defined in the `data-view`
+`data-view-element` and belongs to the `shippingCostView` view, defined in the `data-view`
 attribute.
 
 Whenever the user types something in the
