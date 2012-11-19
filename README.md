@@ -100,4 +100,4 @@ will interpret to which model attribute this element is linked to, in this case
 
 == License
 
-Ruby on Rails is released under the MIT License.
+This framewokr is released under the MIT License.
