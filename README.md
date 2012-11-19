@@ -1,10 +1,10 @@
-== Goals
+## Objectives
 
 * To automatize the process of updating UI elements
 * To not use template engines, to use only HTML
 * To work on the assumption that the persistence mechanism is a RESTful Rails controller
 
-== Draft features
+## Draft features
 
 **HTML**
 ```html
@@ -58,7 +58,7 @@ Emerald.shippingCostController = Emerald.Controller.extend({
     this.persistView = true;
 
     // The Persistence object will send a JSON to the controller, which will
-    // be dealt by the Rails controller. If params has `id`, it'll use PUT, 
+    // be dealt by the Rails controller. If params has `id`, it'll use PUT,
     // otherwise POST
     zipcodeModel.save(params, this);
   }
@@ -98,6 +98,6 @@ The `modelObserver` will check for HTML elements containing `data-observe`, then
 will interpret to which model attribute this element is linked to, in this case
 `cost` in the `shipping` resource, and will update the element automatically.
 
-== License
+## License
 
-This framewokr is released under the MIT License.
+This framework is released under the MIT License.
