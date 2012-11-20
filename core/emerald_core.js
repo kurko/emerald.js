@@ -1,6 +1,7 @@
 var Emerald = {
   Core: {},
   ActionView: {
-    Events: {}
+    Elements: {},
+    Events:   {}
   }
 };

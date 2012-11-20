@@ -1,23 +1,26 @@
-module("Emerald.js ActionView", {
+module("Emerald.ActionView", {
 });
 
-var fixture = $("#qunit-fixture");
+test(".extend initializes a View with the correct actions", function() {
+  var view = Emerald.ActionView.extend({
+    changeFullName: function(){ return 'changed'; },
+    name: 'Alex'
+  });
 
-test("sets data-view attributes in each data-view-element", function(){
-  var element = '<div data-view-element="vader"></div>';
-  var view    = '<div data-view="empire">'+element+'</div>';
-  fixture.html(view);
-  Emerald.ActionView.bindElementsToView();
-  equal( $("[data-view-element=vader]").attr('extendsView'), 'empire');
+  equal( view.changeFullName(), 'changed' );
+  equal( view.name, 'Alex' );
 });
 
-test("binds data-view-elements events to a View action", function(){
-  var letter = '';
-  var actions = { writeLetter: function() { letter = 'a'; } };
-  var element = '<input data-view-element="writeLetter" data-event="keyup">';
-  fixture.html(element);
+test(".extend generate actions that are called whenever an element changes", function() {
+  var html = '<div data-view="cartView"><input data-view-action="update_item"></div>';
+  fixture.html(html);
 
-  Emerald.ActionView.bindViewElementsEventsToView(actions);
-  $('input', fixture).trigger('keyup');
-  equal( letter, 'a');
+  var mock = 1;
+  Emerald.cartView = Emerald.ActionView.extend({
+    update_item: function(){ mock = 2; },
+    name: 'Alex'
+  });
+
+  fixture.find('[data-view-action]').trigger('keyup');
+  equal( mock, 2 );
 });

@@ -32,6 +32,7 @@
   <div id="qunit-fixture">test markup</div>
 
   <script type="text/javascript">
+    var fixture = $("#qunit-fixture");
 
     // hack qunit to not suck for Emerald objects
     var originalTypeof = QUnit.jsDump.typeOf;
@@ -43,9 +44,15 @@
   </script>
 
   <script src="../core/emerald_core.js"></script>
+  <!-- ActionView -->
   <script src="../action_view/lib/action_view.js"></script>
+  <script src="../action_view/lib/elements.js"></script>
+  <script src="../action_view/lib/events.js"></script>
 
   <script src="../core/test/emerald_core_test.js"></script>
+  <!-- ActionView tests -->
   <script src="../action_view/test/action_view_test.js"></script>
+  <script src="../action_view/test/elements_test.js"></script>
+  <script src="../action_view/test/events_test.js"></script>
 </body>
 </html>
