@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Emerald.js Test Suite</title>
+  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen">
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="qunit.js"></script>
+
+  <script type="text/javascript">
+    // Tests should time out after 5 seconds
+    QUnit.config.testTimeout = 2000;
+
+    window.ENV = window.ENV || {};
+
+    // Handle extending prototypes
+    QUnit.config.urlConfig.push('extendprototypes');
+
+    var extendPrototypes = QUnit.urlParams.extendprototypes;
+    ENV['EXTEND_PROTOTYPES'] = !!extendPrototypes;
+
+    // Don't worry about jQuery version
+    ENV['FORCE_JQUERY'] = true;
+  </script>
+</head>
+<body>
+  <h1 id="qunit-header">Emerald.js Test Suite</h1>
+  <h2 id="qunit-banner"></h2>
+  <div id="qunit-testrunner-toolbar"></div>
+  <h2 id="qunit-userAgent"></h2>
+  <ol id="qunit-tests"></ol>
+  <div id="qunit-fixture">test markup</div>
+
+  <script type="text/javascript">
+
+    // hack qunit to not suck for Emerald objects
+    var originalTypeof = QUnit.jsDump.typeOf;
+
+    QUnit.jsDump.typeOf = function(obj) {
+      return originalTypeof.call(this, obj);
+    };
+
+  </script>
+
+  <script src="../core/emerald_core.js"></script>
+  <script src="../action_view/lib/action_view.js"></script>
+
+  <script src="../core/test/emerald_core_test.js"></script>
+  <script src="../action_view/test/action_view_test.js"></script>
+</body>
+</html>
