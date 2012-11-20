@@ -1,5 +1,5 @@
 Emerald.ActionView.Elements.bindToView = function() {
-  $("[data-view-element]").each(function(index, viewElement){
+  $("[data-view-action]").each(function(index, viewElement){
     var elementsView = $(this).closest("[data-view]").data("view");
     viewElement.setAttribute('extendsView', elementsView);
   });

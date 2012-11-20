@@ -1,12 +1,12 @@
 module("Emerald.ActionView.Elements", {
 });
 
-test(".bindToView sets data-view attributes in each data-view-element", function(){
-  var element = '<div data-view-element="vader"></div>';
+test(".bindToView sets data-view attributes in each data-view-action", function(){
+  var element = '<div data-view-action="vader"></div>';
   var view    = '<div data-view="empire">'+element+'</div>';
   fixture.html(view);
   Emerald.ActionView.Elements.bindToView();
-  equal( $("[data-view-element=vader]").attr('extendsView'), 'empire');
+  equal( $("[data-view-action=vader]").attr('extendsView'), 'empire');
 });
 
 test(".dataFieldsSelector returns a string for selecting data fields", function(){
