@@ -6,36 +6,33 @@
 
 ## Draft features
 
+The HTML contains different View. Below, we have a view which has the purpose
+of calculating shipping costs.
+
 **HTML**
 ```html
-<!-- Begins the shippingCostView View -->
 <div class="options" data-view="shippingCostView">
   Choose the shipping type:
-  <input type="radio" name="type" value="slow" data-view-element="zipcodeCalculation" checked="checked" /> Slow
-  <input type="radio" name="type" value="fast" data-view-element="zipcodeCalculation" /> Fast
+  <input type="radio" name="type" value="slow" data-view-action="zipcodeCalculation" checked="checked" /> Slow
+  <input type="radio" name="type" value="fast" data-view-action="zipcodeCalculation" /> Fast
 
-  <!-- it is a zipcodeCalculation element -->
   Type your zipcode:
-  <input value="" name="zipcode" data-view-element="zipcodeCalculation" data-event="keyup" />
+  <input name="zipcode" data-view-element="zipcodeCalculation" data-event="keyup" />
 
-  <span data-observe="shipping.cost">No delivery costs defined</div>
+  <div data-observe="shipping.cost">No delivery costs defined</div>
 </div>
 ```
 
-Here, all elements are bound to `zipcodeCalculation` action as defined in
-`data-view-element` and belongs to the `shippingCostView` view, defined in the `data-view`
-attribute.
+The important points:
 
-Whenever the user types something in the
-`zipcode` field, the `zipcodeCalculation` action below takes place.
-The Javascript part is described below.
+* **View:** all elements are inside a view with `data-view=shippingCostView`
+* **ViewAction:** whenever an element changes, an action is called in the View object
+* **Observer:** whenever we get a response back from the server, the cost div will be updated
 
 **Javascript**
 ```javascript
-// The View, which represents the HTML elements
+// View
 Emerald.shippingCostView = Emerald.View.extend({
-  initialize: function(){ },
-
   // Triggered by the keyup event
   zipcodeCalculation: function(event, fields){
     var value = event.target.value;
@@ -44,57 +41,40 @@ Emerald.shippingCostView = Emerald.View.extend({
   },
 
   isValidZipcode: function(value){
-    return value.replace(/[^0-9]/g, '').length == 8;
+    return value.length == 8;
   }
 });
 
+// Controller
 Emerald.shippingCostController = Emerald.Controller.extend({
   zipcodeCalculation: function(params){
-    // Converts the field values in an JSON object
     params = this.params(params);
-
-    // After saving, the controller will automatically populate the HTML
-    // fields with the JSON returned
-    this.persistView = true;
-
-    // The Persistence object will send a JSON to the controller, which will
-    // be dealt by the Rails controller. If params has `id`, it'll use PUT,
-    // otherwise POST
     zipcodeModel.save(params, this);
   }
 });
 
-// The model
+// Model
 zipcodeModel = activeModel.extend({
-  // This is the controller URL that represents the persistence layer.
-  // Everytime `save` is called, this URL will be called
-  route: Emerald.Router.zipcodeModel,
-
-  // This defines the fields to be used when generated a JSON object to be sent
-  // to the server in order to save the current model
+  route: "/store/my_store/cart/shipping_cost",
   attrAccessible: ['id', 'zipcode', 'type']
 });
-
-Emerald.Router = {
-  zipcodeModel: "/store/my_store/cart/shipping_cost"
-}
 ```
 
 ### Automatic updating UI elements
 
-Consider the field below:
-
-```html
-<span data-observe="shipping.cost">No delivery costs defined</div>
-```
-
-Whenever we get a response from the server, such as
+Whenever we get a response from the server such as
 
 ```
 { 'shipping': {'type': 'fast', 'cost': 'US 10.00'}}
 ```
 
-The `modelObserver` will check for HTML elements containing `data-observe`, then
+the **modelObserver** object will update all elements in the page based on the `data-observe` attribute, such as
+
+```html
+<div data-observe="shipping.cost">$10</div>
+```
+
+The modelObserver will check for HTML elements containing `data-observe`, then
 will interpret to which model attribute this element is linked to, in this case
 `cost` in the `shipping` resource, and will update the element automatically.
 
