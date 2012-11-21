@@ -60,23 +60,21 @@ zipcodeModel = activeModel.extend({
 });
 ```
 
-### Automatic updating UI elements
+### Automatically updating UI elements
 
 Whenever we get a response from the server such as
 
 ```
-{ 'shipping': {'type': 'fast', 'cost': 'US 10.00'}}
+{ 'shipping': {'type': 'fast', 'cost': '$10'} }
 ```
 
-the **modelObserver** object will update all elements in the page based on the `data-observe` attribute, such as
+the **Controller** object will automagically update all elements in the page based on the `data-observe` attribute, such as
 
 ```html
 <div data-observe="shipping.cost">$10</div>
 ```
 
-The modelObserver will check for HTML elements containing `data-observe`, then
-will interpret to which model attribute this element is linked to, in this case
-`cost` in the `shipping` resource, and will update the element automatically.
+In this case, `cost` is an attribute of the `shipping` resource.
 
 ## License
 
