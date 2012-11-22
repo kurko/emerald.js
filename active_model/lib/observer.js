@@ -43,4 +43,6 @@ modelObserver.prototype.update = function(jsonData){
     }
 
   });
+
+  return true;
 };

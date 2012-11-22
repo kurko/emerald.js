@@ -1,46 +1,35 @@
-function emeraldActionController(){
-  this.extend = function(properties){
-    var _this = this;
-    _this.properties = properties;
+Emerald.Controller.extend = function(actions){
+  var instance = new Object;
+  var _this = this;
+  _this.actions = actions;
 
-    return new emeraldActionControllerInstance(properties);
-  }
-}
-
-function emeraldActionControllerInstance(properties){
-  var singleton = function() {
-    this.self = function(properties){
-      this.properties = properties;
-
-      for (propertyName in properties) {
-        if (!this[propertyName])
-          this[propertyName] = properties[propertyName];
-      }
-
-      return this;
-    }
-
-    this.params = function(domElements){
-      var params = new Object;
-
-      for (i = 0; i < domElements.length; i++) {
-        var element = domElements[i];
-        params[element.name] = element.value;
-      }
-
-      return params;
-    }
-
-    this.persistView = true;
-
-    this.persistViewCallback = function(JSON) {
-      debugger;
-      if (this.persistView)
-        Emerald.modelObserver.update(JSON);
-      return true;
-    }
+  // defines the method of the new controller instance
+  for (action in actions) {
+    instance[action] = actions[action];
   }
 
-  var instance = new singleton().self(properties);
+  instance.params = function(domElements){
+    var params = new Object;
+
+    for (i = 0; i < domElements.length; i++) {
+      var element = domElements[i];
+      params[element.name] = element.value;
+    }
+
+    return params;
+  }
+
+  instance.persistView = true;
+
+  instance.persistViewCallback = function(JSON, observerObject) {
+    if (!observerObject)
+      observerObject = Emerald.modelObserver;
+
+    if (this.persistView)
+      observerObject.update(JSON);
+
+    return true;
+  }
+
   return instance;
 }
