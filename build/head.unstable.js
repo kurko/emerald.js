@@ -1,11 +1,13 @@
 var Emerald = {
+  Version: "0.0.1",
   Core: {},
+  Controller: {},
   ActionView: {
     Elements: {},
     Events:   {}
-  }
+  },
+  Model: {}
 };
-
 
 Emerald.ActionView.extend = function(actions){
   // instance object to be returned
@@ -77,108 +79,119 @@ Emerald.ActionView.Events.defineDefaultEvent = function(domElement, _event) {
     return 'keyup';
 }
 
-function emeraldActionController(){
-  this.extend = function(properties){
-    var _this = this;
-    _this.properties = properties;
+Emerald.Controller.extend = function(actions){
+  var instance = new Object;
+  var _this = this;
+  _this.actions = actions;
 
-    return new emeraldActionControllerInstance(properties);
-  }
-}
-
-function emeraldActionControllerInstance(properties){
-  var singleton = function() {
-    this.self = function(properties){
-      this.properties = properties;
-
-      for (propertyName in properties) {
-        if (!this[propertyName])
-          this[propertyName] = properties[propertyName];
-      }
-
-      return this;
-    }
-
-    this.params = function(domElements){
-      var params = new Object;
-
-      for (i = 0; i < domElements.length; i++) {
-        var element = domElements[i];
-        params[element.name] = element.value;
-      }
-
-      return params;
-    }
-
-    this.persistView = true;
-
-    this.persistViewCallback = function(JSON) {
-      debugger;
-      if (this.persistView)
-        Emerald.modelObserver.update(JSON);
-      return true;
-    }
+  // defines the method of the new controller instance
+  for (action in actions) {
+    instance[action] = actions[action];
   }
 
-  var instance = new singleton().self(properties);
+  instance.params = function(domElements){
+    var params = new Object;
+
+    for (i = 0; i < domElements.length; i++) {
+      var element = domElements[i];
+      params[element.name] = element.value;
+    }
+
+    return params;
+  }
+
+  instance.persistView = true;
+
+  instance.persistViewCallback = function(JSON, observerObject) {
+    if (!observerObject)
+      observerObject = Emerald.Model.Observer;
+
+    if (this.persistView)
+      observerObject.update(JSON);
+
+    return true;
+  }
+
   return instance;
 }
 
-function emeraldActiveModel(){
-  this.extend = function(properties){
-    var _this = this;
-    _this.properties = properties;
+Emerald.Model.extend = function(properties) {
+  var instance = new Object;
+  var _this = this;
+  this.properties = properties;
 
-    return new emeraldActiveModelInstance(properties);
+  // defines the method of the new view instance
+  for (property in properties) {
+    instance[property] = properties[property];
   }
+
+  // runs initialization on startup
+  if (this.properties.initialize) {
+    $(document).ready(function(){ _this.properties.initialize(); });
+  }
+
+  // defines attrAccessible fields
+  Emerald.Model.Attributes.initAttrAccessible(instance, properties.attrAccessible);
+
+  instance.get = function(attribute) {
+    if (_this.properties[attribute])
+      return _this.properties[attribute];
+    else
+      return null;
+  }
+
+  instance.save = function(data, andCallbackController, persistenceObject) {
+    if (!persistenceObject)
+      persistenceObject = Emerald.Persistence;
+
+    // TODO verify that `data` fields are the ones listed in this.attrAccessible
+    return new persistenceObject(this).save(data, andCallbackController);
+  }
+
+  return instance;
 }
 
-function emeraldActiveModelInstance(properties){
-  var singleton = function() {
-    this.self = function(properties){
-      this.properties = properties;
-      return this;
-    }
+Emerald.Model.Attributes = {}
+Emerald.Model.Attributes.initAttrAccessible = function(model, attrAccessible) {
+  model.attributes = function() { return false; }
+  if (!attrAccessible)
+    return false;
 
-    this.attributes = function() {
-      attributesValues = {};
-      if (this.properties.attrAccessible) {
-        var attributes = this.properties.attrAccessible;
-        for (attribute in attributes) {
-          var attributeName = attributes[attribute];
-          if (this[attributeName])
-            attributesValues[attributeName] = this[attributeName];
-        }
-      }
-      return attributesValues;
-    }
+  var attributes = attrAccessible;
+  for (attribute in attributes) {
+    var attributeName = attributes[attribute];
 
-    this.route = function() { return this.properties.route; }
+    // model method
+    if (!model[attributeName])
+      model[attributeName] = "";
 
-    this.get = function(attribute) {
-      if (this.properties[attribute])
-        return this.properties[attribute];
+    // attributes hash
+    model.attributes = function(attributeName) {
+      var attributes = Emerald.Model.Attributes.getAttributes(model);
+
+      if (attributeName)
+        return attributes[attributeName];
       else
-        return "none";
-    }
-
-    this.save = function(data, andCallbackController) {
-      // TODO verify that `data` fields are the ones listed in this.attrAccessible
-      debugger;
-      var persistence = new emeraldPersistence(this).save(data, andCallbackController);
-      return persistence;
+        return attributes;
     }
   }
 
-  function createAccessibleAttributes(singleton, attributes) {
-    for (attribute in attributes) {
-      singleton.prototype[attributes[attribute]] = null;
-    }
-  }
+  return true;
+}
 
-  var instance = new singleton().self(properties);
-  createAccessibleAttributes(singleton, properties.attrAccessible);
-  return instance;
+Emerald.Model.Attributes.getAttributes = function(model) {
+  var attributesValues = {}
+  if (!model.attrAccessible)
+    return attributesValues;
+
+  var attributes = model.attrAccessible;
+  for (attribute in attributes) {
+    var attributeName = attributes[attribute];
+
+    // model method
+    attributesValues[attributeName] = model[attributeName];
+  }
+  return attributesValues;
 }
 
 // Observes the whole document for [data-observe] elements. Whenever an Ajax
@@ -200,93 +213,96 @@ function emeraldActiveModelInstance(properties){
 // The first HTML element will be updated with "My item" automatically and
 // the second, price, with "US$40,00".
 //
-function modelObserver(){}
+Emerald.Model.Observer = {
+  update: function(jsonData){
+    $("[data-observe]").each(function(index){
+      var observing = $(this).data("observe");
+      var observedResources = observing.split(".");
 
-Emerald.modelObserver = new modelObserver();
-
-modelObserver.prototype.update = function(jsonData){
-  $("[data-observe]").each(function(index){
-    var observing = $(this).data("observe");
-    var observedResources = observing.split(".");
-
-    var currentValue = jsonData;
-    $.each(observedResources, function(index, value){
-      if (currentValue[value] || typeof currentValue[value] == "string")
+      var currentValue = jsonData;
+      $.each(observedResources, function(index, value){
+        if (currentValue[value] || typeof currentValue[value] == "string")
         currentValue = currentValue[value];
-      else
+        else
         return false;
+      });
+
+      switch (typeof currentValue) {
+        case "number":
+        case "bool":
+        case "string":
+          $(this).html(currentValue);
+          return true;
+      }
+
     });
 
-    switch (typeof currentValue) {
-      case "number":
-      case "bool":
-      case "string":
-        $(this).html(currentValue);
-        return true;
-    }
+    return true;
+  }
+}
 
-  });
-};
+Emerald.Persistence = function(model, persistenceObject) {
+  var instance = new Object;
 
-function emeraldPersistence(model){
-  var singleton = function() {
-    this.initialize = function(model, _class) {
-      this.model = model;
-      this._class = _class;
-      return this;
-    }
+  if (!persistenceObject)
+    persistenceObject = Emerald.Persistence;
 
-    this.save = function(data, callbackController){
-      return new this._class.PersistenceSave().save(data, callbackController);
-    }
+  instance.save = function(model, callbackController){
+    return persistenceObject.save(model, callbackController);
   }
 
-  this.PersistenceSave = function() {
-    var singleton = function() {
-      this.initialize = function(model, _class) {
-        this.model = model;
-        this._class = _class;
-        return this;
-      }
-
-      this.save = function(data, controller) {
-        //var attributes = this.model.attributes();
-        var attributes = data;
-        var _controller = controller;
-
-        var requestSpecs = {
-          url: this.model.route(),
-          data: attributes,
-          type: this.requestType(attributes),
-          dataType: "json"
-        };
-
-        $.ajax(requestSpecs).done(function(JSON) {
-          debugger;
-          if (_controller)
-            _controller.persistViewCallback(JSON);
-        }).fail(function(response) {
-          // TODO handle errors
-          if (_controller)
-            _controller.persistViewCallback(JSON);
-        });
-
-        return requestSpecs;
-      }
-
-      this.requestType = function(attributes) {
-        if (attributes["id"])
-          return "PUT";
-        else
-          return "POST";
-      }
-    }
-
-    var instance = new singleton().initialize(model, this);
-    return instance;
-  }
-
-  var instance = new singleton().initialize(model, this);
   return instance;
 }
 
+
+Emerald.Persistence.save = function(model, callbackController) {
+  var instance = function() {
+    this.initialize = function(model) {
+      this.model = model;
+      return this;
+    }
+
+    this.save = function(model, controller) {
+      var attributes = this.model.attributes();
+
+      if (!attributes)
+        return false;
+
+      var _controller = controller;
+      var requestSpecs = Emerald.Persistence.saveRequest(model);
+
+      $.ajax(requestSpecs).done(function(jsonResponse) {
+        if (_controller)
+          _controller.persistViewCallback(jsonResponse);
+      }).fail(function(jsonResponse) {
+        if (_controller)
+          _controller.failedAjaxResponseCallback(jsonResponse);
+      });
+
+      return requestSpecs;
+    }
+
+    return this;
+  }
+
+  instance().initialize(model);
+  return instance().save(model, callbackController);
+}
+
+Emerald.Persistence.saveRequest = function(model) {
+  var attributes = model.attributes();
+
+  return {
+    url: model.route,
+    data: attributes,
+    type: Emerald.Persistence.saveRequestType(attributes),
+    dataType: "json"
+  }
+}
+
+Emerald.Persistence.saveRequestType = function(attributes) {
+  if (attributes["id"])
+    return "PUT";
+  else
+    return "POST";
+}
