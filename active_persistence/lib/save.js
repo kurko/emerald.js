@@ -16,7 +16,7 @@ Emerald.Persistence.save = function(model, callbackController) {
 
       $.ajax(requestSpecs).done(function(jsonResponse) {
         if (_controller)
-          _controller.persistViewCallback(jsonResponse);
+          _controller.afterAjaxResponseSuccessCallback(jsonResponse);
       }).fail(function(jsonResponse) {
         if (_controller)
           _controller.failedAjaxResponseCallback(jsonResponse);

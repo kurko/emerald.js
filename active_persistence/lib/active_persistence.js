@@ -4,8 +4,10 @@ Emerald.Persistence = function(model, persistenceObject) {
   if (!persistenceObject)
     persistenceObject = Emerald.Persistence;
 
-  instance.save = function(model, callbackController){
-    return persistenceObject.save(model, callbackController);
+  instance.model = model;
+
+  instance.save = function(callbackController){
+    return persistenceObject.save(instance.model, callbackController);
   }
 
   return instance;

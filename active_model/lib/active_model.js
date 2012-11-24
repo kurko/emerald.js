@@ -23,12 +23,21 @@ Emerald.Model.extend = function(properties) {
       return null;
   }
 
-  instance.save = function(data, andCallbackController, persistenceObject) {
+  instance.update = function(domElements){
+    for (i = 0; i < domElements.length; i++) {
+      var element = domElements[i];
+      this[element.name] = element.value;
+    }
+
+    return this;
+  }
+
+  instance.save = function(andCallbackController, persistenceObject) {
     if (!persistenceObject)
       persistenceObject = Emerald.Persistence;
 
     // TODO verify that `data` fields are the ones listed in this.attrAccessible
-    return new persistenceObject(this).save(data, andCallbackController);
+    return new persistenceObject(this).save(andCallbackController);
   }
 
   return instance;
