@@ -1,8 +1,25 @@
-## Objectives
+# Emerald.js
 
-* To automatize the process of updating UI elements
-* To not use template engines, to use only HTML
-* To work on the assumption that the persistence mechanism is a RESTful Rails controller
+A Javascript framework for interactive client-side applications:
+
+* convention over configuration, highly opinionated framework
+* uses RESTful Rails controllers to save and load data
+* uses models to seamlessly save and persist data
+* uses plain old HTML (no handlebars)
+* updates elements on the page automatically after server responses
+* 100% test coverage
+
+Although it's stable, we do not recommend using it in production as important
+features are still being built. As of now, if you decide to use it, you will be
+able to at least organize your JS code a lot better. A list of the current
+features will be created soon.
+
+## Using with Rails
+
+Use the [emerald-rails](https://github.com/kurko/emerald-rails) gem to easily
+install the framework.
+
+------------------
 
 ## Draft features
 
