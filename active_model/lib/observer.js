@@ -17,32 +17,30 @@
 // The first HTML element will be updated with "My item" automatically and
 // the second, price, with "US$40,00".
 //
-function modelObserver(){}
+Emerald.Model.Observer = {
+  update: function(jsonData){
+    $("[data-observe]").each(function(index){
+      var observing = $(this).data("observe");
+      var observedResources = observing.split(".");
 
-Emerald.modelObserver = new modelObserver();
-
-modelObserver.prototype.update = function(jsonData){
-  $("[data-observe]").each(function(index){
-    var observing = $(this).data("observe");
-    var observedResources = observing.split(".");
-
-    var currentValue = jsonData;
-    $.each(observedResources, function(index, value){
-      if (currentValue[value] || typeof currentValue[value] == "string")
+      var currentValue = jsonData;
+      $.each(observedResources, function(index, value){
+        if (currentValue[value] || typeof currentValue[value] == "string")
         currentValue = currentValue[value];
-      else
+        else
         return false;
+      });
+
+      switch (typeof currentValue) {
+        case "number":
+        case "bool":
+        case "string":
+          $(this).html(currentValue);
+          return true;
+      }
+
     });
 
-    switch (typeof currentValue) {
-      case "number":
-      case "bool":
-      case "string":
-        $(this).html(currentValue);
-        return true;
-    }
-
-  });
-
-  return true;
-};
+    return true;
+  }
+}

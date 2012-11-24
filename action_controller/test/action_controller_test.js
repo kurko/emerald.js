@@ -41,6 +41,6 @@ test("#persistViewCallback notifies the model observer", function(){
   equal( params,  true );
 
   test("Emerald.modelObserver.update contract", function(){
-    ok( Emerald.modelObserver.update({}) );
+    ok( Emerald.Model.Observer.update({}) );
   });
 });

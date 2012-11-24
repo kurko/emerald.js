@@ -8,6 +8,14 @@ test(".extend returns an instance with its properties as functions", function(){
   equal( myModel.myMethod(), "some_value" );
 });
 
+test(".extend returns an instance with attrAccessible fields as values", function(){
+  var myModel = Emerald.Model.extend({
+    myMethod: function(){ return "some_value"; }
+  });
+
+  equal( myModel.myMethod(), "some_value" );
+});
+
 test(".extend runs initialize() method on startup", function(){
   var initializationMock = false;
   var myModel = Emerald.Model.extend({
@@ -33,16 +41,18 @@ test("#save asks the persistence layer to save", function(){
 
   var persistenceSaveMock = function(data, callback) {
     persistenceMock = data+'+'+callback;
+    return true;
   }
 
-  myModel.save('data', 'callback', function() {
+  var stub = function() {
     this.save = persistenceSaveMock;
     return this;
-  });
+  }
+  myModel.save('data', 'callback', stub);
 
   deepEqual( persistenceMock, 'data+callback' );
 
   test("#save contract with Persistence layer save", function() {
-    ok( myModel.save('data', 'callback') );
+    ok( myModel.save('data', 'callback', stub) );
   });
 });

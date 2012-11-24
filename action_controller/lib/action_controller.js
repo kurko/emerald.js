@@ -23,7 +23,7 @@ Emerald.Controller.extend = function(actions){
 
   instance.persistViewCallback = function(JSON, observerObject) {
     if (!observerObject)
-      observerObject = Emerald.modelObserver;
+      observerObject = Emerald.Model.Observer;
 
     if (this.persistView)
       observerObject.update(JSON);

@@ -1,44 +1,51 @@
 Emerald.Persistence.save = function(model, callbackController) {
-  var singleton = function() {
-    this.initialize = function(model, _class) {
+  var instance = function() {
+    this.initialize = function(model) {
       this.model = model;
-      this._class = _class;
       return this;
     }
 
-    this.save = function(data, controller) {
-      //var attributes = this.model.attributes();
-      var attributes = data;
+    this.save = function(model, controller) {
+      var attributes = this.model.attributes();
+
+      if (!attributes)
+        return false;
+
       var _controller = controller;
+      var requestSpecs = Emerald.Persistence.saveRequest(model);
 
-      var requestSpecs = {
-        url: this.model.route(),
-        data: attributes,
-        type: this.requestType(attributes),
-        dataType: "json"
-      };
-
-      $.ajax(requestSpecs).done(function(JSON) {
-        debugger;
+      $.ajax(requestSpecs).done(function(jsonResponse) {
         if (_controller)
-          _controller.persistViewCallback(JSON);
-      }).fail(function(response) {
-        // TODO handle errors
+          _controller.persistViewCallback(jsonResponse);
+      }).fail(function(jsonResponse) {
         if (_controller)
-          _controller.persistViewCallback(JSON);
+          _controller.failedAjaxResponseCallback(jsonResponse);
       });
 
       return requestSpecs;
     }
 
-    this.requestType = function(attributes) {
-      if (attributes["id"])
-        return "PUT";
-      else
-        return "POST";
-    }
+    return this;
   }
 
-  var instance = new singleton().initialize(model, this);
-  return instance;
+  instance().initialize(model);
+  return instance().save(model, callbackController);
+}
+
+Emerald.Persistence.saveRequest = function(model) {
+  var attributes = model.attributes();
+
+  return {
+    url: model.route,
+    data: attributes,
+    type: Emerald.Persistence.saveRequestType(attributes),
+    dataType: "json"
+  }
+}
+
+Emerald.Persistence.saveRequestType = function(attributes) {
+  if (attributes["id"])
+    return "PUT";
+  else
+    return "POST";
 }
