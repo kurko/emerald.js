@@ -22,18 +22,22 @@ Emerald.Controller.extend = function(actions){
   instance.persistView = true;
 
   // Persistence callbacks
-  instance.afterAjaxResponseSuccessCallback = function(JSON, observerObject) {
+  instance.afterAjaxResponseSuccessCallback = function(responseText, observerObject) {
     if (!observerObject)
       observerObject = Emerald.Model.Observer;
 
     if (this.persistView)
-      observerObject.update(JSON);
+      observerObject.update(responseText);
 
     return true;
   }
 
-  instance.failedAjaxResponseCallback = function(json) {
+  instance.failedAjaxResponseCallback = function(responseText) {
     // TODO implement
+    if (typeof observerObject == 'undefined' || !observerObject)
+      observerObject = Emerald.Model.Observer;
+
+    observerObject.update(responseText);
   }
 
   return instance;

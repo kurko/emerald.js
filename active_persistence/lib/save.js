@@ -14,12 +14,12 @@ Emerald.Persistence.save = function(model, callbackController) {
       var _controller = controller;
       var requestSpecs = Emerald.Persistence.saveRequest(model);
 
-      $.ajax(requestSpecs).done(function(jsonResponse) {
+      $.ajax(requestSpecs).done(function(response) {
         if (_controller)
-          _controller.afterAjaxResponseSuccessCallback(jsonResponse);
-      }).fail(function(jsonResponse) {
+          _controller.afterAjaxResponseSuccessCallback(response);
+      }).fail(function(response) {
         if (_controller)
-          _controller.failedAjaxResponseCallback(jsonResponse);
+          _controller.failedAjaxResponseCallback($.parseJSON(response.responseText));
       });
 
       return requestSpecs;
