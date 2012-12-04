@@ -102,14 +102,23 @@ Emerald.Controller.extend = function(actions){
 
   instance.persistView = true;
 
-  instance.persistViewCallback = function(JSON, observerObject) {
+  // Persistence callbacks
+  instance.afterAjaxResponseSuccessCallback = function(responseText, observerObject) {
     if (!observerObject)
       observerObject = Emerald.Model.Observer;
 
     if (this.persistView)
-      observerObject.update(JSON);
+      observerObject.update(responseText);
 
     return true;
+  }
+
+  instance.failedAjaxResponseCallback = function(responseText) {
+    // TODO implement
+    if (typeof observerObject == 'undefined' || !observerObject)
+      observerObject = Emerald.Model.Observer;
+
+    observerObject.update(responseText);
   }
 
   return instance;
@@ -140,12 +149,21 @@ Emerald.Model.extend = function(properties) {
       return null;
   }
 
-  instance.save = function(data, andCallbackController, persistenceObject) {
+  instance.update = function(domElements){
+    for (i = 0; i < domElements.length; i++) {
+      var element = domElements[i];
+      this[element.name] = element.value;
+    }
+
+    return this;
+  }
+
+  instance.save = function(andCallbackController, persistenceObject) {
     if (!persistenceObject)
       persistenceObject = Emerald.Persistence;
 
     // TODO verify that `data` fields are the ones listed in this.attrAccessible
-    return new persistenceObject(this).save(data, andCallbackController);
+    return new persistenceObject(this).save(andCallbackController);
   }
 
   return instance;
@@ -247,8 +265,10 @@ Emerald.Persistence = function(model, persistenceObject) {
   if (!persistenceObject)
     persistenceObject = Emerald.Persistence;
 
-  instance.save = function(model, callbackController){
-    return persistenceObject.save(model, callbackController);
+  instance.model = model;
+
+  instance.save = function(callbackController){
+    return persistenceObject.save(instance.model, callbackController);
   }
 
   return instance;
@@ -271,12 +291,12 @@ Emerald.Persistence.save = function(model, callbackController) {
       var _controller = controller;
       var requestSpecs = Emerald.Persistence.saveRequest(model);
 
-      $.ajax(requestSpecs).done(function(jsonResponse) {
+      $.ajax(requestSpecs).done(function(response) {
         if (_controller)
-          _controller.persistViewCallback(jsonResponse);
-      }).fail(function(jsonResponse) {
+          _controller.afterAjaxResponseSuccessCallback(response);
+      }).fail(function(response) {
         if (_controller)
-          _controller.failedAjaxResponseCallback(jsonResponse);
+          _controller.failedAjaxResponseCallback($.parseJSON(response.responseText));
       });
 
       return requestSpecs;
