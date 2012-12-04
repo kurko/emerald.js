@@ -30,12 +30,12 @@ test("#params returns a Javascript object representing the View data", function(
   equal( params["last_name"],  "value2" );
 });
 
-test("#persistViewCallback notifies the model observer", function(){
+test("#afterDataSaveCallback notifies the model observer", function(){
   var controller = Emerald.Controller.extend({});
   var mockObserverUpdate = '';
   var observerDouble = { update: function() { mockObserverUpdate = 'called'; } };
   var json = { 'name': 'first_name', 'value': 'value1' }
-  var params = controller.persistViewCallback(json, observerDouble);
+  var params = controller.afterDataSaveCallback(json, observerDouble);
 
   equal( mockObserverUpdate,  'called' );
   equal( params,  true );

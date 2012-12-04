@@ -19,9 +19,7 @@ Emerald.Controller.extend = function(actions){
     return params;
   }
 
-  instance.persistView = true;
-
-  instance.persistViewCallback = function(JSON, observerObject) {
+  instance.afterDataSaveCallback = function(JSON, observerObject) {
     if (!observerObject)
       observerObject = Emerald.Model.Observer;
 
@@ -29,6 +27,10 @@ Emerald.Controller.extend = function(actions){
       observerObject.update(JSON);
 
     return true;
+  }
+
+  instance.failedDataSaveCallback = function(json) {
+    // TODO: implement
   }
 
   return instance;
